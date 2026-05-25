@@ -1,0 +1,6 @@
+mla-decoding/*/flashinfer/
+mla-decoding/*/results/
+__pycache__/
+*.pyc
+*.nsys-rep
+*.qdrep
