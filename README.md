@@ -1,26 +1,26 @@
 # Operator Test
 
-这个仓库用于沉淀不同算子的性能对比方式。每个算子使用一个独立目录，目录内需要说明和提供：
+This repository records performance comparison methods for different operators. Each operator uses a separate directory, and each directory should document and provide:
 
-- 测试环境如何启动
-- 依赖的上游仓库如何准备
-- 单 case 如何运行
-- 批量 case 如何运行
-- 耗时结果如何获取
+- How to start the test environment
+- How to prepare dependent upstream repositories
+- How to run a single case
+- How to run batch cases
+- How to collect latency results
 
-## 算子目录
+## Operator Directories
 
-| 目录 | 算子 | 当前目标 |
+| Directory | Operator | Current Target |
 | --- | --- | --- |
-| `mla-decoding/` | MLA paged attention decoding | DeepSeek V3 MLA；按硬件平台分目录，目前包含 B200、MI355 |
+| `mla-decoding/` | MLA paged attention decoding | DeepSeek V3 MLA; organized by hardware platform, currently including B200 and MI355 |
 
-## Agent Setup 约定
+## Agent Setup Convention
 
-当用户让 agent `setup` 某个 kernel/operator 时，进入对应算子和硬件目录执行该目录下的 setup 脚本。例如：
+When the user asks the agent to `setup` a kernel/operator, enter the corresponding operator and hardware directory and run the setup script in that directory. For example:
 
 ```bash
 cd mla-decoding/B200
 ./setup.sh
 ```
 
-setup 脚本会把上游 benchmark 仓库 clone 或更新到硬件目录内部。这样后续运行脚本时不需要手动切路径，直接在硬件目录调用即可。
+The setup script clones or updates the upstream benchmark repository inside the hardware directory. After that, scripts can be run directly from the hardware directory without manually changing paths.

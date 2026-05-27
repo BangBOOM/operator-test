@@ -1,10 +1,10 @@
 # MLA Decoding on B200
 
-这个目录记录 NVIDIA B200 上 DeepSeek V3 MLA decoding 场景的算子 benchmark 方法。B200 上 TRT-LLM 的 MLA kernel 集成在 FlashInfer 仓库里，这里使用 `BatchMLAPagedAttentionWrapper`，backend 为 `trtllm-native`。
+This directory records operator benchmark methods for the DeepSeek V3 MLA decoding scenario on NVIDIA B200. On B200, the TRT-LLM MLA kernel is integrated in the FlashInfer repository. This benchmark uses `BatchMLAPagedAttentionWrapper` with the `trtllm-native` backend.
 
-## B200 环境
+## B200 Environment
 
-以下命令在宿主机执行。在本仓库根目录启动容器：
+Run the following commands on the host. Start the container from the root of this repository:
 
 ```bash
 IMAGE=nvcr.io/nvidia/ai-dynamo/tensorrtllm-runtime:0.8.1.post1
@@ -22,31 +22,31 @@ docker run -it --name ${NAME} \
   ${IMAGE}
 ```
 
-下面的命令都在容器内执行。进入容器后，在 B200 硬件目录 setup FlashInfer：
+Run all commands below inside the container. After entering the container, set up FlashInfer in the B200 hardware directory:
 
 ```bash
 cd /workspace/mla-decoding/B200
 ./setup.sh
 ```
 
-该命令会 clone 或更新：
+This command clones or updates:
 
 ```text
 mla-decoding/B200/flashinfer
 ```
 
-setup 还会把本目录的 `attention.py` 覆盖到 FlashInfer 的 benchmark routine：
+The setup step also overwrites FlashInfer's benchmark routine with this directory's `attention.py`:
 
 ```text
 mla-decoding/B200/attention.py
   -> mla-decoding/B200/flashinfer/benchmarks/routines/attention.py
 ```
 
-本目录下的 run 脚本默认都从这个本地 FlashInfer checkout 执行。
+The run scripts in this directory execute from this local FlashInfer checkout by default.
 
 ## Nsight Systems
 
-如果需要用 `nsys profile` 获取 profile 结果，在容器内安装 Nsight Systems CLI：
+To collect profile results with `nsys profile`, install the Nsight Systems CLI inside the container:
 
 ```bash
 wget -O NsightSystems-linux-cli-public-2026.2.1.210-3763964.deb \
@@ -56,23 +56,23 @@ dpkg -i --ignore-depends=libglib2.0-0 \
   ./NsightSystems-linux-cli-public-2026.2.1.210-3763964.deb
 ```
 
-## B200 FP8 Decoding 单 Case
+## B200 FP8 Decoding Single Case
 
-以下命令在容器内执行。运行给定的 FP8 decoding case：
+Run the following commands inside the container. Run the configured FP8 decoding case:
 
 ```bash
 cd /workspace/mla-decoding/B200
 ./run_mla_single.sh
 ```
 
-用 Nsight Systems profile 同一个 case：
+Profile the same case with Nsight Systems:
 
 ```bash
 cd /workspace/mla-decoding/B200
 PROFILE=1 ./run_mla_single.sh
 ```
 
-默认参数：
+Default parameters:
 
 ```text
 batch_size=16
@@ -90,34 +90,34 @@ dry_run_iters=10
 backend=trtllm-native
 ```
 
-原始 benchmark 输出会打印到 stdout。`PROFILE=1` 时，nsys 输出前缀默认为：
+Raw benchmark output is printed to stdout. When `PROFILE=1`, the default nsys output prefix is:
 
 ```text
 mla-decoding/B200/results/trtllm_mla_decode
 ```
 
-可以用环境变量覆盖参数，不需要改脚本：
+Parameters can be overridden with environment variables without editing the script:
 
 ```bash
 BATCH_SIZE=32 S_QO=1 NUM_QO_HEADS=128 ./run_mla_single.sh
 ```
 
-## B200 FP8 Decoding 批量 Case
+## B200 FP8 Decoding Batch Cases
 
-以下命令在容器内执行。批量测试多个 batch size：
+Run the following commands inside the container. Benchmark multiple batch sizes:
 
 ```bash
 cd /workspace/mla-decoding/B200
 ./run_mla_bench.sh
 ```
 
-默认 batch size：
+Default batch sizes:
 
 ```text
 1 2 4 8 12 16 24 32 48 64 96 128 192 256 512
 ```
 
-批量脚本默认参数按 DeepSeek V3 decoding shape 配置：
+The batch script's default parameters are configured for the DeepSeek V3 decoding shape:
 
 ```text
 page_size=32
@@ -134,13 +134,13 @@ dry_run_iters=10
 backend=trtllm-native
 ```
 
-覆盖 batch size 或其他参数：
+Override batch sizes or other parameters:
 
 ```bash
 BATCH_SIZES="1 8 16 32" S_QO=4 NUM_QO_HEADS=16 ./run_mla_bench.sh
 ```
 
-脚本输出如下
+Script output looks like this:
 
 ```text
 batch_size=1 [PERF] trtllm-native  :: median time 0.016 ms; std 0.000 ms; achieved tflops 140.085 TFLOPs/sec; achieved tb_per_sec 0.298 TB/sec
@@ -148,11 +148,11 @@ batch_size=2 [PERF] trtllm-native  :: median time 0.018 ms; std 0.001 ms; achiev
 batch_size=4 [PERF] trtllm-native  :: median time 0.019 ms; std 0.000 ms; achieved tflops 479.349 TFLOPs/sec; achieved tb_per_sec 1.021 TB/sec
 ```
 
-如果某个 case 失败，脚本会把失败的 batch size 和完整 benchmark 输出打印到 stderr，然后以非 0 状态退出。
+If a case fails, the script prints the failed batch size and the full benchmark output to stderr, then exits with a non-zero status.
 
-## 等价原始命令
+## Equivalent Raw Command
 
-以下命令在容器内执行。单 case profile 等价于在 `mla-decoding/B200/flashinfer` 目录执行：
+Run the following command inside the container. The single-case profile is equivalent to running this from the `mla-decoding/B200/flashinfer` directory:
 
 ```bash
 nsys profile -t cuda,nvtx,osrt,cudnn,cublas \

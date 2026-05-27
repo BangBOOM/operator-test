@@ -1,12 +1,12 @@
 # MLA Decoding
 
-这个目录记录 DeepSeek V3 MLA decoding 场景的算子 benchmark 方法。MLA decoding 是 DeepSeek V3 推理 decode 阶段的 attention 相关算子对比项，当前主要关注不同硬件和 backend 下的耗时表现。
+This directory records operator benchmark methods for the DeepSeek V3 MLA decoding scenario. MLA decoding is an attention-related operator comparison item in the decode stage of DeepSeek V3 inference. The current focus is latency across different hardware and backends.
 
-本层 README 只描述算子本身和目录组织。具体硬件环境如何启动、依赖仓库如何 setup、测试脚本如何执行，放在对应硬件目录的 README 中。
+This README only describes the operator itself and the directory organization. Details about starting the hardware environment, setting up dependent repositories, and running test scripts are documented in the README for each hardware directory.
 
-## 硬件目录
+## Hardware Directories
 
-| 目录 | 硬件 | 说明 |
+| Directory | Hardware | Description |
 | --- | --- | --- |
-| `B200/` | NVIDIA B200 | FlashInfer 中的 TensorRT-LLM native backend |
-| `MI355/` | AMD MI355 | SGLang ROCm 容器内 `/sgl-workspace/aiter` 的 `test_mla_persistent.py` |
+| `B200/` | NVIDIA B200 | TensorRT-LLM native backend in FlashInfer |
+| `MI355/` | AMD MI355 | `test_mla_persistent.py` under `/sgl-workspace/aiter` in the SGLang ROCm container |
